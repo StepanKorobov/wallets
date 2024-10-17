@@ -22,11 +22,11 @@ def get_database_url() -> str:
     :rtype: str
     """
 
-    db_user: str = os.getenv("TEST_DB_USER")
-    db_password: str = os.getenv("TEST_DB_PASSWORD")
-    db_host: str = os.getenv("TEST_DB_HOST")
-    db_port: str = os.getenv("TEST_DB_PORT")
-    db_name: str = os.getenv("TEST_DB_NAME")
+    db_user: str = os.getenv("DB_USER")
+    db_password: str = os.getenv("DB_PASSWORD")
+    db_host: str = os.getenv("DB_HOST")
+    db_port: str = os.getenv("DB_PORT")
+    db_name: str = os.getenv("DB_NAME")
 
     database_url: str = (
         f"postgresql+asyncpg://{db_user}:{db_password}@"
@@ -38,6 +38,8 @@ def get_database_url() -> str:
 
 # Получаем URL БД
 DATABASE_URL: str = get_database_url()
+# DATABASE_URL: str = "postgresql+asyncpg://test_user:test_password@127.0.0.1:6000/test"
+
 
 # Создаём асинхронный движок
 engine: AsyncEngine = create_async_engine(DATABASE_URL)
