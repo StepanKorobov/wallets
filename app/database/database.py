@@ -68,3 +68,7 @@ class Wallet(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     wallet_uuid: Mapped[int] = mapped_column(String, unique=True)
     balance: Mapped[float] = mapped_column(Float, default=0)
+
+    # метод класса для конвертации экземпляра класса в формат json
+    def to_json(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
