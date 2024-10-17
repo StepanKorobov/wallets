@@ -6,6 +6,11 @@ from sqlalchemy.sql.selectable import Select
 
 from database.database import Wallet, async_session
 
+
+class BalanceException(Exception):
+    pass
+
+
 async def get_wallet_balance(wallet_uuid: str) -> Dict[str: str, str: int] | None:
     """
     Корутин возвращающий информацию о балансе счёта по wallet_uuid
@@ -32,9 +37,50 @@ async def get_wallet_balance(wallet_uuid: str) -> Dict[str: str, str: int] | Non
                     "balance": wallet.balance,
                 }
 
+                # Возвращаем словарь с данными
                 return wallet_data
 
+            # Кошелёк не найден
             return None
+
+
+async def update_wallet_balance(wallet_uuid: str, operation_type: str, amount: int | float):
+    async with async_session() as session:
+        async with session.begin():
+            # Запрос на получение данных
+            wallet_query: Select = (
+                select(Wallet)
+                .filter(wallet_uuid == Wallet.wallet_uuid)
+            )
+            wallet_result: ChunkedIteratorResult = await session.execute(wallet_query)
+            wallet: Wallet | None = wallet_result.scalars().one_or_none()
+
+            # Если кошелёк найден
+            if wallet:
+                # Операция пополнения счёта
+                if operation_type == "DEPOSIT":
+                    wallet.balance += amount
+                # Операция снятия со счёта
+                elif operation_type == "WITHDRAW":
+                    # Проверяем достаточно ли средств
+                    if wallet.balance < amount:
+                        # Если нет, выкидываем исключене
+                        raise BalanceException
+
+                    wallet.balance -= amount
+
+                # Создаём словарь для ответа
+                wallet_data: Dict[str: str, str: int] = {
+                    "wallet_uuid": wallet.wallet_uuid,
+                    "balance": wallet.balance,
+                }
+
+                # Возвращаем словарь с данными
+                return wallet_data
+
+            # Кошелёк не найден
+            return None
+
 
 async def test():
     """Корутина которая заполняет данными БД для демонстрации"""
