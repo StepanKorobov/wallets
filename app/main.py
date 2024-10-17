@@ -17,7 +17,10 @@ async def lifespan(app: FastAPI):
     # Создаём таблицы в БД, если они не созданы
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
+    # Нужен только для заполнения тестовыми данными (для демонстрации работы)
     await test()
+
     yield
 
     # Завершаем сессию
