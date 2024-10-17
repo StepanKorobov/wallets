@@ -37,3 +37,26 @@ async def test_add_user_to_db():
         ]
 
         assert result_json == wallet_json, "no users added"
+
+
+async def test_get_wallet_response(ac: AsyncClient):
+    """"""
+    response = await ac.get("/api/v1/wallets/111")
+    expected_response = {
+        "wallet_uuid": "111",
+        "balance": 0,
+    }
+
+    assert response.status_code == 200
+    assert response.json() == expected_response
+
+
+async def test_get_wallet_not_found(ac: AsyncClient):
+    """"""
+    response = await ac.get("/api/v1/wallets/666")
+    expected_response = {
+        "error": "wallet 666 not found."
+    }
+
+    assert response.status_code == 404
+    assert response.json() == expected_response
