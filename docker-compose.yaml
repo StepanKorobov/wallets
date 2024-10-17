@@ -1,0 +1,39 @@
+version: '3.12'
+
+services:
+  postgresql:
+    container_name: postgresql
+    image: postgres:latest
+    restart: always
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - log_destination=stderr
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    volumes:
+      - ./db/:/var/lib/postgresql/data
+    hostname: ${DB_HOST}
+    networks:
+      - wallet_network
+
+  app:
+    container_name: fastapi
+    build:
+      context: .
+      dockerfile: Dockerfile
+    stop_signal: SIGTERM
+    restart: always
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgresql
+    networks:
+      - wallet_network
+
+
+networks:
+  wallet_network:
+    driver: bridge
+
