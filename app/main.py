@@ -1,6 +1,8 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, status
+from fastapi import FastAPI, status, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
 from database.database import engine, Base, session, Wallet
@@ -80,4 +82,12 @@ async def get_wallets(wallet_uuid: str):
     return JSONResponse(
         content={"error": f"wallet {wallet_uuid} not found."},
         status_code=status.HTTP_404_NOT_FOUND,
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=422,
+        content=jsonable_encoder({"detail": exc.errors(), "body": exc.body}),
     )

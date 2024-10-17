@@ -16,17 +16,19 @@ load_dotenv()
 
 
 def get_database_url() -> str:
-    """
-    Функция создающая url адрес БД из переменных окружения
-    :return: URL БД
-    :rtype: str
-    """
-
-    db_user: str = os.getenv("DB_USER")
-    db_password: str = os.getenv("DB_PASSWORD")
-    db_host: str = os.getenv("DB_HOST")
-    db_port: str = os.getenv("DB_PORT")
-    db_name: str = os.getenv("DB_NAME")
+    """Функция получающая адрес БД, нужно для тестов"""
+    if os.environ.get("ENV") == "test":
+        db_user: str = os.getenv("TEST_DB_USER")
+        db_password: str = os.getenv("TEST_DB_PASSWORD")
+        db_host: str = os.getenv("TEST_DB_HOST")
+        db_port: str = os.getenv("TEST_DB_PORT")
+        db_name: str = os.getenv("TEST_DB_NAME")
+    else:
+        db_user: str = os.getenv("DB_USER")
+        db_password: str = os.getenv("DB_PASSWORD")
+        db_host: str = os.getenv("DB_HOST")
+        db_port: str = os.getenv("DB_PORT")
+        db_name: str = os.getenv("DB_NAME")
 
     database_url: str = (
         f"postgresql+asyncpg://{db_user}:{db_password}@"
