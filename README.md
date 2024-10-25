@@ -28,7 +28,7 @@ DB_HOST = database
 # Порт от БД
 DB_PORT = 5432
 # Имя БД
-DB_NAME = "twitter"
+DB_NAME = "wallets"
 
 
 # Настройки для тестовой базы дынных
